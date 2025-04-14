@@ -128,24 +128,58 @@ GET /api/fetch-booked-seats
 
 ---
 
-## 🗃️ Database Schema Overview
+---
 
-**Table: `users`**
-| Field | Type |
-|------------|---------|
-| id | SERIAL PRIMARY KEY |
-| name | VARCHAR |
-| email | VARCHAR UNIQUE |
-| password | TEXT |
-| user_type | INT |
+## 🛠️ Database Setup (PostgreSQL)
 
-**Table: `seats`**
-| Field | Type |
-|------------|---------|
-| seat_number | SERIAL |
-| row_number | TEXT |
-| booked_by | INT (FK → users.id) |
-| booked_at | TIMESTAMP |
+Follow the steps below to create the necessary tables and populate the initial data in your PostgreSQL database:
+
+### 📋 Create Tables
+
+```sql
+-- Create users table
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  email VARCHAR(100) UNIQUE NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  user_type SMALLINT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create seats table
+CREATE TABLE seats (
+  id SERIAL PRIMARY KEY,
+  seat_number INTEGER UNIQUE NOT NULL, -- 1 to 80
+  row_number INTEGER NOT NULL,         -- 1 to 12
+  booked_by INTEGER REFERENCES users(id),
+  booked_at TIMESTAMP
+);
+```
+
+### 📦 Populate `seats` Table
+
+Run the following SQL block once to auto-generate 80 seats, each mapped to a row:
+
+```sql
+-- Run this once to populate the 80 seats
+DO $$
+DECLARE
+  i INTEGER := 1;
+BEGIN
+  WHILE i <= 80 LOOP
+    INSERT INTO seats (seat_number, row_number)
+    VALUES (i, CASE
+                WHEN i <= 77 THEN CEIL(i / 7.0)::INTEGER
+                ELSE 12
+              END);
+    i := i + 1;
+  END LOOP;
+END$$;
+```
+
+> 💡 Seats 1 to 77 are evenly distributed across rows 1 to 11 (7 seats per row), and the last 3 seats go into row 12.
 
 ---
 
