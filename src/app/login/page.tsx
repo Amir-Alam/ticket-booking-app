@@ -13,7 +13,10 @@ interface FormData {
 const LoginPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [showAdminCredentials, setShowAdminCredentials] = useState(false); // Track the visibility of admin creds
   const togglePassword = () => setShowPassword(!showPassword);
+  const toggleAdminCredentials = () =>
+    setShowAdminCredentials(!showAdminCredentials); // Toggle admin creds
 
   const [formData, setFormData] = useState<FormData>({
     email: "",
@@ -105,7 +108,7 @@ const LoginPage = () => {
               value={formData.password}
               onChange={handleChange}
               placeholder="Password"
-              className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg peer focus:outline-none focus:ring-2 focus:ring-blue-400 text-black placeholder-gray-400"
+              className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg peer focus:outline-none focus:ring-2 focus:ring-blue-400 text-black placeholder-gray-400 "
             />
             <button
               type="button"
@@ -116,11 +119,11 @@ const LoginPage = () => {
             </button>
           </div>
 
-          <div className="flex justify-between items-center text-sm text-gray-600">
+          {/* <div className="flex justify-between items-center text-sm text-gray-600">
             <a href="#" className="text-blue-500 right-8 hover:underline">
               Forgot password?
             </a>
-          </div>
+          </div> */}
 
           {error && (
             <div className="bg-red-100 text-red-700 p-3 rounded-md text-sm font-medium border border-red-300">
@@ -130,11 +133,36 @@ const LoginPage = () => {
 
           <button
             type="submit"
-            className="w-full bg-gradient-to-r from-indigo-500 to-blue-500 text-white font-semibold py-3 rounded-lg hover:from-indigo-600 hover:to-blue-600 transition duration-300 ease-in-out flex items-center justify-center gap-2"
+            className="w-full bg-gradient-to-r from-indigo-500 to-blue-500 text-white font-semibold py-3 rounded-lg hover:from-indigo-600 hover:to-blue-600 transition duration-300 ease-in-out flex items-center justify-center gap-2 cursor-pointer"
           >
             <LogIn size={20} /> Sign In
           </button>
         </form>
+
+        {/* Admin Login Info Section */}
+        <div className="mt-6">
+          <button
+            onClick={toggleAdminCredentials}
+            className="flex items-center text-blue-500 font-semibold hover:underline"
+          >
+            {showAdminCredentials ? <EyeOff size={20} /> : <Eye size={20} />}
+            <span className="ml-2">Show Admin Credentials</span>
+          </button>
+
+          {showAdminCredentials && (
+            <div className="mt-4 bg-blue-50 border border-blue-200 p-4 rounded-lg">
+              <p className="text-sm text-gray-700">
+                <strong>Admin Login:</strong>
+              </p>
+              <p className="text-sm text-blue-600">
+                <strong>Email:</strong> admin@email.com
+              </p>
+              <p className="text-sm text-blue-600">
+                <strong>Password:</strong> Admin@123
+              </p>
+            </div>
+          )}
+        </div>
 
         <p className="text-sm text-center text-gray-600 mt-6">
           Don’t have an account?{" "}

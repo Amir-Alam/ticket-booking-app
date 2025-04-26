@@ -128,7 +128,7 @@ const TicketBooking: React.FC = () => {
             {loading ? (
               <div className="text-center text-black">Loading seats...</div>
             ) : (
-              <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-7 gap-2">
+              <div className="grid grid-cols-7 sm:grid-cols-7 md:grid-cols-7 gap-3">
                 {seats.map((seat) => {
                   const isBooked = bookedSeats.includes(seat);
                   return (
