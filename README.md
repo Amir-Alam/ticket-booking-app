@@ -224,7 +224,7 @@ App will be running at: [http://localhost:3000](http://localhost:3000)
 
 - All seat booking actions are transactional for consistency.
 - `bcryptjs` used with 12 salt rounds for secure password storage.
-- Form validation happens both on server and client (if frontend is connected).
+- Form validation happens both on server and client.
 - Add rate limiting or JWT auth for production setup.
 
 ---
@@ -238,6 +238,200 @@ App will be running at: [http://localhost:3000](http://localhost:3000)
 
 ---
 
+---
+
+## 🚀 Deployment Guide (Production)
+
+Follow these steps to **deploy the Smart Seat Booking System** on a real server (AWS EC2 with Nginx, Node.js)!
+
+---
+
+### 🛠️ 1. Set Up Your EC2 Instance
+
+- Login to AWS Console → EC2 → Launch a new instance.
+- Choose an OS: **Ubuntu Server 22.04 LTS** (or your preferred version).
+- Select an instance type (e.g., `t2.micro` for free tier).
+- Create a new key pair or use existing (download `.pem` file safely!).
+- Open ports:
+  - Allow HTTP (port 80), HTTPS (port 443), and SSH (port 22) in your **Security Group**.
+
+---
+
+### ⚙️ 2. Install Required Software
+
+SSH into your instance:
+
+```bash
+ssh -i your-key.pem ubuntu@your-ec2-public-ip
+```
+
+Then install:
+
+```bash
+# Update your server
+sudo apt update && sudo apt upgrade -y
+
+# Install Node.js (LTS version)
+curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+sudo apt install -y nodejs
+
+# Install Git
+sudo apt install git -y
+
+# Install Nginx (for reverse proxy)
+sudo apt install nginx -y
+```
+
+✅ **Now your server is ready!**
+
+---
+
+### 📥 3. Clone Your Project
+
+Move to a desired directory (like `/var/www`):
+
+```bash
+cd /var/www
+sudo git clone https://github.com/Amir-Alam/ticket-booking-app.git.git
+cd seat-booking-app
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Create your `.env` file with your production database details.
+
+---
+
+### 🛠️ 4. Build and Start the App
+
+```bash
+npm run build
+npm run start
+```
+
+👉 This will **build** your Next.js app for production and **start** it on default port `3000`.
+
+---
+
+### 🌐 5. Configure Nginx as Reverse Proxy
+
+Open the Nginx config file:
+
+```bash
+sudo nano /etc/nginx/sites-available/default
+```
+
+Replace the contents with:
+
+```nginx
+server {
+    listen 80;
+    server_name your-domain.com; # or your public IP if no domain
+
+    location / {
+        proxy_pass http://localhost:3000; # Forward requests to Node.js app
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+```
+
+Save and exit.
+
+**Restart Nginx** to apply changes:
+
+```bash
+sudo systemctl restart nginx
+```
+
+✅ Now, **when users hit your public IP or domain**, Nginx will **catch** the request and **forward** it to your running Node.js app!
+
+---
+
+### 🎯 6. Keep Your App Alive Forever (PM2)
+
+Install **PM2** to run your app as a background service:
+
+```bash
+sudo npm install pm2 -g
+pm2 start npm --name "seat-booking-app" -- start
+pm2 save
+pm2 startup
+```
+
+This ensures your app **auto-starts even after server reboot!** 🔥
+
+---
+
+### 🔒 7. (Optional) Set Up SSL with Let's Encrypt
+
+Want HTTPS (SSL) for FREE? 🛡️ Use Certbot:
+
+```bash
+sudo apt install certbot python3-certbot-nginx -y
+sudo certbot --nginx
+```
+
+Follow the prompts to automatically install an SSL certificate for your domain.
+
+---
+
+## 📌 Behind the Scenes: What Happens When a User Visits?
+
+- **DNS** resolves your domain to your **EC2 Public IP**.
+- **Nginx** receives the request on port 80 (HTTP).
+- Nginx **reverse proxies** the request to **localhost:3000** where your Node.js (Next.js) app is running.
+- **Your App** processes the request and sends back the response (HTML, CSS, JS).
+- Browser renders your beautiful seat booking website! 🪑✨
+
+---
+
+## 🎉 Final Result
+
+App is now **LIVE**, **Production-ready**, and **accessible** worldwide! 🌎🚀🎉👏
+
+---
+
+# 🏁 Quick Deployment Commands Cheat Sheet
+
+```bash
+# SSH into EC2
+ssh -i your-key.pem ubuntu@your-ec2-public-ip
+
+# Update and Install
+sudo apt update && sudo apt upgrade -y
+sudo apt install nginx git -y
+curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+sudo apt install -y nodejs
+
+# Clone Project
+cd /var/www
+sudo git clone https://github.com/Amir-Alam/ticket-booking-app.git
+cd seat-booking-app
+npm install
+npm run build
+npm run start
+
+# Configure Nginx
+sudo nano /etc/nginx/sites-available/default
+sudo systemctl restart nginx
+
+# Install PM2
+sudo npm install -g pm2
+pm2 start npm --name "seat-booking-app" -- start
+pm2 save
+pm2 startup
+```
+
+---
+
 ## 🤝 Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
@@ -246,7 +440,7 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 
 ## 🧑‍💻 Author
 
-Made with ❤️ by [Your Name](https://github.com/your-username)
+Made with ❤️ by [Amir Alam](https://github.com/Amir-Alam)
 
 ---
 
